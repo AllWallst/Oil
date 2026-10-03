@@ -9,7 +9,7 @@ import yfinance as yf
 from datetime import datetime
 
 # -----------------------------------------------------------------------------
-# 0. CONFIGURATION & HIGH-CONTRAST DARK MODE STYLING
+# 0. CONFIGURATION & THEME SWITCHER
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="Global Oil Crisis & Diesel Shock Command Center",
@@ -18,79 +18,198 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom High-Contrast Dark Mode CSS
-st.markdown("""
-<style>
-    /* Global Background & High-Contrast Typography */
-    .stApp {
-        background-color: #0d1117;
-        color: #e6edf3;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
-    
-    /* Headings */
-    h1, h2, h3, h4, h5, h6 {
-        color: #f0f6fc !important;
-        font-weight: 700 !important;
-        letter-spacing: -0.3px;
-    }
-    
-    /* Metrics High Visibility */
-    div[data-testid="stMetric"] {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 8px;
-        padding: 14px 18px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-    }
-    div[data-testid="stMetric"] label {
-        color: #8b949e !important;
-        font-size: 0.92rem !important;
-        font-weight: 600 !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    div[data-testid="stMetricValue"] > div {
-        color: #58a6ff !important;
-        font-size: 1.85rem !important;
-        font-weight: 800 !important;
-    }
-    
-    /* Country Dossier Card */
-    .dossier-card {
-        background: linear-gradient(135deg, #161b22 0%, #1f242c 100%);
-        border: 1px solid #388bfd;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    /* Tabs & Radio Buttons */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 8px;
-    }
-    .stTabs [data-baseweb="tab"] {
-        background-color: #161b22;
-        border: 1px solid #30363d;
-        border-radius: 6px;
-        color: #c9d1d9;
-        font-weight: 600;
-        padding: 8px 16px;
-    }
-    .stTabs [aria-selected="true"] {
-        background-color: #238636 !important;
-        border-color: #2ea043 !important;
-        color: #ffffff !important;
-    }
-    
-    /* Dividers */
-    hr {
-        border-color: #30363d !important;
-        margin: 1.5rem 0;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Sidebar: Theme Selector
+theme_choice = st.sidebar.radio(
+    "🎨 Display Mode:",
+    ["🌙 Dark Mode", "☀️ Light Mode"],
+    horizontal=True
+)
+is_dark = (theme_choice == "🌙 Dark Mode")
+plotly_template = "plotly_dark" if is_dark else "plotly_white"
 
+# High-Contrast Dynamic CSS
+if is_dark:
+    css = """
+    <style>
+        /* Base Dark Palette */
+        .stApp {
+            background-color: #0d1117 !important;
+            color: #ffffff !important;
+        }
+        
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+
+        /* ALL Text & Paragraphs */
+        p, span, div, li {
+            color: #e6edf3 !important;
+        }
+        
+        /* High-Visibility Radio Buttons (Fixes "Operating Oil Refineries" readability) */
+        div[data-testid="stRadio"] label {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            margin-right: 8px !important;
+            transition: all 0.2s ease;
+        }
+        div[data-testid="stRadio"] label:hover {
+            border-color: #58a6ff !important;
+        }
+        div[data-testid="stRadio"] label p,
+        div[data-testid="stRadio"] label span,
+        div[data-testid="stRadio"] label div {
+            color: #ffffff !important;
+            font-size: 1.02rem !important;
+            font-weight: 700 !important;
+        }
+
+        /* Metrics Display */
+        div[data-testid="stMetric"] {
+            background-color: #161b22 !important;
+            border: 1px solid #388bfd !important;
+            border-radius: 8px !important;
+            padding: 14px 18px !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5) !important;
+        }
+        div[data-testid="stMetric"] label {
+            color: #8b949e !important;
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+        }
+        div[data-testid="stMetricValue"] > div {
+            color: #58a6ff !important;
+            font-size: 2.0rem !important;
+            font-weight: 800 !important;
+        }
+
+        /* Dossier Card */
+        .dossier-card {
+            background: linear-gradient(135deg, #161b22 0%, #1c2128 100%) !important;
+            border: 2px solid #58a6ff !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+        }
+
+        /* Form Inputs & Selectbox */
+        div[data-baseweb="select"] > div {
+            background-color: #161b22 !important;
+            color: #ffffff !important;
+            border: 1px solid #388bfd !important;
+            font-weight: 600 !important;
+        }
+
+        /* Tabs */
+        .stTabs [data-baseweb="tab"] {
+            background-color: #161b22 !important;
+            border: 1px solid #30363d !important;
+            border-radius: 6px !important;
+            color: #ffffff !important;
+            font-weight: 700 !important;
+            padding: 8px 18px !important;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #238636 !important;
+            border-color: #2ea043 !important;
+            color: #ffffff !important;
+        }
+        
+        hr { border-color: #30363d !important; }
+    </style>
+    """
+else:
+    css = """
+    <style>
+        /* Base Light Palette */
+        .stApp {
+            background-color: #f6f8fa !important;
+            color: #1f2328 !important;
+        }
+        
+        /* Headers */
+        h1, h2, h3, h4, h5, h6 {
+            color: #0d1117 !important;
+            font-weight: 700 !important;
+        }
+
+        /* ALL Text & Paragraphs */
+        p, span, div, li {
+            color: #1f2328 !important;
+        }
+        
+        /* High-Visibility Radio Buttons */
+        div[data-testid="stRadio"] label {
+            background-color: #ffffff !important;
+            border: 1px solid #d0d7de !important;
+            border-radius: 8px !important;
+            padding: 8px 14px !important;
+            margin-right: 8px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+        div[data-testid="stRadio"] label p,
+        div[data-testid="stRadio"] label span,
+        div[data-testid="stRadio"] label div {
+            color: #0d1117 !important;
+            font-size: 1.02rem !important;
+            font-weight: 700 !important;
+        }
+
+        /* Metrics Display */
+        div[data-testid="stMetric"] {
+            background-color: #ffffff !important;
+            border: 1px solid #0969da !important;
+            border-radius: 8px !important;
+            padding: 14px 18px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+        }
+        div[data-testid="stMetric"] label {
+            color: #57606a !important;
+            font-size: 0.95rem !important;
+            font-weight: 700 !important;
+            text-transform: uppercase;
+        }
+        div[data-testid="stMetricValue"] > div {
+            color: #0969da !important;
+            font-size: 2.0rem !important;
+            font-weight: 800 !important;
+        }
+
+        /* Dossier Card */
+        .dossier-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f6f8fa 100%) !important;
+            border: 2px solid #0969da !important;
+            border-radius: 10px !important;
+            padding: 20px !important;
+            margin-bottom: 20px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Tabs */
+        .stTabs [data-baseweb="tab"] {
+            background-color: #ffffff !important;
+            border: 1px solid #d0d7de !important;
+            border-radius: 6px !important;
+            color: #1f2328 !important;
+            font-weight: 700 !important;
+            padding: 8px 18px !important;
+        }
+        .stTabs [aria-selected="true"] {
+            background-color: #0969da !important;
+            border-color: #0969da !important;
+            color: #ffffff !important;
+        }
+        
+        hr { border-color: #d0d7de !important; }
+    </style>
+    """
+
+st.markdown(css, unsafe_allow_html=True)
 CURRENT_YEAR = 2026
 
 # -----------------------------------------------------------------------------
@@ -98,20 +217,7 @@ CURRENT_YEAR = 2026
 # -----------------------------------------------------------------------------
 @st.cache_data(ttl=1800)
 def fetch_live_market_data():
-    """
-    Fetches real-time commodity prices from NYMEX/ICE:
-    - WTI Crude (CL=F)
-    - Brent Crude (BZ=F)
-    - NY Harbor ULSD / Heating Oil (HO=F) [$/gal -> converted to $/bbl (x42)]
-    - RBOB Gasoline (RB=F) [$/gal -> converted to $/bbl (x42)]
-    """
-    tickers = {
-        "WTI": "CL=F",
-        "Brent": "BZ=F",
-        "Diesel": "HO=F",
-        "Gasoline": "RB=F"
-    }
-    
+    tickers = {"WTI": "CL=F", "Brent": "BZ=F", "Diesel": "HO=F", "Gasoline": "RB=F"}
     live_prices = {}
     try:
         for name, sym in tickers.items():
@@ -126,40 +232,24 @@ def fetch_live_market_data():
         brent = live_prices["Brent"]
         diesel_bbl = live_prices["Diesel"] * 42.0
         gas_bbl = live_prices["Gasoline"] * 42.0
-        
-        # 3:2:1 Crack Spread = [(2 * Gasoline + 1 * Diesel) - 3 * WTI] / 3
         crack_321 = ((2.0 * gas_bbl + diesel_bbl) - (3.0 * wti)) / 3.0
         diesel_crack = diesel_bbl - wti
         
         return {
-            "WTI": round(wti, 2),
-            "Brent": round(brent, 2),
-            "Diesel_bbl": round(diesel_bbl, 2),
-            "Gasoline_bbl": round(gas_bbl, 2),
-            "Crack_321": round(crack_321, 2),
-            "Diesel_Crack": round(diesel_crack, 2),
-            "Status": "LIVE FEED (NYMEX/ICE)",
-            "Timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+            "WTI": round(wti, 2), "Brent": round(brent, 2), "Diesel_bbl": round(diesel_bbl, 2),
+            "Gasoline_bbl": round(gas_bbl, 2), "Crack_321": round(crack_321, 2), "Diesel_Crack": round(diesel_crack, 2),
+            "Status": "LIVE FEED (NYMEX/ICE)", "Timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
         }
     except Exception:
-        # High-integrity fallback baseline
         return {
-            "WTI": 78.50,
-            "Brent": 82.20,
-            "Diesel_bbl": 114.20,
-            "Gasoline_bbl": 103.50,
-            "Crack_321": 28.50,
-            "Diesel_Crack": 35.70,
-            "Status": "FALLBACK (Cached Baseline)",
+            "WTI": 78.50, "Brent": 82.20, "Diesel_bbl": 114.20, "Gasoline_bbl": 103.50,
+            "Crack_321": 28.50, "Diesel_Crack": 35.70, "Status": "FALLBACK (Cached Baseline)",
             "Timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
         }
 
 @st.cache_data(ttl=900)
 def fetch_energy_news():
-    feeds = [
-        "https://oilprice.com/rss/main",
-        "https://www.rigzone.com/news/rss/rigzone_latest.aspx"
-    ]
+    feeds = ["https://oilprice.com/rss/main", "https://www.rigzone.com/news/rss/rigzone_latest.aspx"]
     articles = []
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
 
@@ -188,13 +278,6 @@ def fetch_energy_news():
 
 @st.cache_data(ttl=3600)
 def load_country_oil_data():
-    """
-    Consolidated country-level dataset audited against EIA, IEA, and OPEC bulletins:
-    - Production & Baseline (mb/d)
-    - Proven Reserves (Billion Barrels / Bbbl)
-    - Active Refinery Counts & Daily Refining Capacity (mb/d)
-    - R/P Ratio (Years Left) and Depletion Year ETA
-    """
     data = [
         {"Country": "United States", "ISO": "USA", "Production_mbd": 13.2, "Baseline_mbd": 13.2, 
          "Reserves_Bbbl": 48.0, "Refinery_Count": 130, "Refining_Cap_mbd": 18.1,
@@ -243,42 +326,23 @@ def load_country_oil_data():
          "Crude_Type": "Light Sour", "API_Gravity": 45.0, "Sulfur_Pct": 0.70, "Key_Grade": "CPC Blend"}
     ]
     df = pd.DataFrame(data)
-
-    # Annual Extraction = (mb/d * 365) / 1000 = Billion Barrels/Year
     df["Annual_Extraction_Bbbl"] = (df["Production_mbd"] * 365.0) / 1000.0
-    
-    # R/P Ratio = Proven Reserves / Annual Extraction
     df["Years_Left"] = (df["Reserves_Bbbl"] / df["Annual_Extraction_Bbbl"]).round(1)
-    
-    # Exhaustion Year ETA
     df["ETA_Exhaustion_Year"] = df["Years_Left"].apply(
         lambda y: f"{int(CURRENT_YEAR + y)}" if (CURRENT_YEAR + y) < 2250 else "2250+ (Multi-Century)"
     )
-    
-    # Net Refining Balance = Domestic Refining Capacity - Crude Production (Positive = Needs crude imports; Negative = Net crude exporter)
     df["Refining_Balance_mbd"] = (df["Refining_Cap_mbd"] - df["Production_mbd"]).round(2)
     return df
 
 # -----------------------------------------------------------------------------
 # 2. SIDEBAR CONTROLS
 # -----------------------------------------------------------------------------
+st.sidebar.markdown("---")
 st.sidebar.title("🎛️ Disruption Simulator")
-st.sidebar.markdown("Simulate geopolitical & downstream shocks:")
-
 sim_hormuz_block = st.sidebar.slider("Strait of Hormuz Disruption (mb/d)", 0.0, 20.0, 10.0, 0.5)
 sim_bab_mandeb_block = st.sidebar.checkbox("Bab al-Mandab Strait Closed (Red Sea Reroute)", value=True)
 sim_refinery_loss = st.sidebar.slider("Global Refineries Offline (mb/d)", 0.0, 8.0, 3.5, 0.25)
 sim_china_export_cut = st.sidebar.slider("China Refined Export Cut (mb/d)", 0.0, 2.0, 0.8, 0.1)
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### 📋 Macro Baselines")
-st.sidebar.caption("""
-• **Global Demand Baseline:** 102.5 mb/d  
-• **Global Diesel Demand:** 30.0 mb/d  
-• **Saudi East-West Pipeline Capacity:** 5.5 mb/d  
-• **UAE Fujairah Pipeline Capacity:** 1.5 mb/d  
-• **Normal VLCC Day Rate:** ~$35,000/day
-""")
 
 # -----------------------------------------------------------------------------
 # 3. LIVE MARKET STATUS BANNER & MACRO BALANCE
@@ -286,13 +350,12 @@ st.sidebar.caption("""
 live_mkt = fetch_live_market_data()
 
 st.title("🛢️ Global Oil Crisis & Diesel Shock Command Center")
-st.caption(f"Status: **{live_mkt['Status']}** | Last Update: {live_mkt['Timestamp']} | Direct NYMEX/ICE Feed")
+st.caption(f"Market Data: **{live_mkt['Status']}** | Synced: **{live_mkt['Timestamp']}** | Direct NYMEX/ICE Futures")
 
-# Live Ticker Banner
 t1, t2, t3, t4 = st.columns(4)
-t1.metric("Live Brent Crude", f"${live_mkt['Brent']:.2f}/bbl", "Global Seaborne Benchmark")
+t1.metric("Live Brent Crude", f"${live_mkt['Brent']:.2f}/bbl", "Global Seaborne Standard")
 t2.metric("Live WTI Crude", f"${live_mkt['WTI']:.2f}/bbl", "US Pipeline Benchmark")
-t3.metric("Live Wholesale Diesel", f"${live_mkt['Diesel_bbl']:.2f}/bbl", f"+${live_mkt['Diesel_Crack']:.2f}/bbl Diesel Spread")
+t3.metric("Live Wholesale Diesel", f"${live_mkt['Diesel_bbl']:.2f}/bbl", f"+${live_mkt['Diesel_Crack']:.2f}/bbl Diesel Crack")
 t4.metric("Live 3:2:1 Crack Margin", f"${live_mkt['Crack_321']:.2f}/bbl", "Refiner Processing Spread")
 
 st.markdown("---")
@@ -303,13 +366,13 @@ current_production = (df_countries["Production_mbd"].sum() + 45.0) - sim_hormuz_
 supply_deficit = GLOBAL_BASELINE_DEMAND - current_production
 
 m1, m2, m3, m4 = st.columns(4)
-m1.metric("Global Daily Demand Needed", f"{GLOBAL_BASELINE_DEMAND:.1f} mb/d", "IEA/EIA Baseline")
-m2.metric("Net Available Supply", f"{current_production:.1f} mb/d", f"-{sim_hormuz_block:.1f} mb/d Offline", delta_color="inverse")
+m1.metric("Global Demand Target", f"{GLOBAL_BASELINE_DEMAND:.1f} mb/d", "IEA/EIA Baseline")
+m2.metric("Net Available Supply", f"{current_production:.1f} mb/d", f"-{sim_hormuz_block:.1f} mb/d Disruptions", delta_color="inverse")
 m3.metric("Global Net Balance", f"{(-supply_deficit):.1f} mb/d", "DEFICIT" if supply_deficit > 0 else "BALANCED", delta_color="inverse" if supply_deficit > 0 else "normal")
 m4.metric("Global Spare Capacity", "1.8 mb/d", "Trapped behind Gulf Chokepoints" if sim_hormuz_block > 4 else "Operational", delta_color="inverse")
 
 if supply_deficit > 0:
-    st.error(f"🚨 **STRUCTURAL DEFICIT DETECTED:** The world is running short by **{supply_deficit:.1f} million barrels per day**. Commercial stockpiles and government SPRs are drawing down rapidly.")
+    st.error(f"🚨 **STRUCTURAL DEFICIT DETECTED:** The world is running short by **{supply_deficit:.1f} million barrels per day**. Commercial stockpiles and emergency SPRs are drawing down rapidly.")
 
 # -----------------------------------------------------------------------------
 # 4. COUNTRY FOCUS MODE (DEEP DIVE DOSSIER)
@@ -329,39 +392,38 @@ with st.container():
     st.markdown(f"""
     <div class="dossier-card">
         <h3 style="margin-top:0; color:#58a6ff;">📌 Country Dossier: {country_row['Country']}</h3>
-        <p style="color:#8b949e; margin-bottom:15px;">Primary Grade: <b>{country_row['Key_Grade']}</b> | Classification: <b>{country_row['Crude_Type']}</b></p>
+        <p style="margin-bottom:0px; font-weight:600;">Primary Benchmark: <b>{country_row['Key_Grade']}</b> | Classification: <b>{country_row['Crude_Type']}</b></p>
     </div>
     """, unsafe_allow_html=True)
     
     cd1, cd2, cd3, cd4, cd5 = st.columns(5)
     cd1.metric("Daily Production", f"{country_row['Production_mbd']:.2f} mb/d", f"Baseline: {country_row['Baseline_mbd']:.2f} mb/d")
-    cd2.metric("Proven Reserves", f"{country_row['Reserves_Bbbl']:.1f} Bbbl", "Geological Audit")
-    cd3.metric("Operating Refineries", f"{country_row['Refinery_Count']} Plants", f"{country_row['Refining_Cap_mbd']:.2f} mb/d Capacity")
-    cd4.metric("Reserves Runway", f"{country_row['Years_Left']:.0f} Years", f"Exhaustion ETA: {country_row['ETA_Exhaustion_Year']}")
+    cd2.metric("Proven Reserves", f"{country_row['Reserves_Bbbl']:.1f} Bbbl", "Audited Reserves")
+    cd3.metric("Active Refineries", f"{country_row['Refinery_Count']} Plants", f"{country_row['Refining_Cap_mbd']:.2f} mb/d Capacity")
+    cd4.metric("Reserves Runway", f"{country_row['Years_Left']:.0f} Years", f"Exhaustion: {country_row['ETA_Exhaustion_Year']}")
     
-    # Refining self-sufficiency description
     bal = country_row['Refining_Balance_mbd']
     if bal > 0:
         cd5.metric("Refining Balance", f"+{bal:.2f} mb/d", "Net Crude Importer (Refining Surplus)", delta_color="normal")
     elif bal < 0:
         cd5.metric("Refining Balance", f"{bal:.2f} mb/d", "Net Crude Exporter (Refining Deficit)", delta_color="inverse")
     else:
-        cd5.metric("Refining Balance", "0.0 mb/d", "Zero Domestic Refining (100% Export)")
+        cd5.metric("Refining Balance", "0.0 mb/d", "Zero Domestic Refining")
         
-    st.caption(f"""
-    **Analysis for {country_row['Country']}:** API Gravity is **{country_row['API_Gravity']}°** with **{country_row['Sulfur_Pct']}% Sulfur**. 
-    {"It produces light sweet crude, which yields abundant gasoline but relatively low diesel yields." if country_row['API_Gravity'] > 35 else "It produces medium/heavy crude, rich in heavy distillate molecules that yield substantial diesel and jet fuel when refined."}
-    {"⚠️ Notice: This nation has ZERO domestic refineries, forcing it to export 100% of unrefined crude and import 100% of finished diesel/gasoline." if country_row['Refinery_Count'] == 0 else ""}
+    st.info(f"""
+    **Analysis for {country_row['Country']}:** API Gravity is **{country_row['API_Gravity']}°** with **{country_row['Sulfur_Pct']}% Sulfur Content**. 
+    {"It produces light sweet crude, which yields abundant motor gasoline but relatively low diesel yields per barrel." if country_row['API_Gravity'] > 35 else "It produces medium/heavy crude, rich in heavy distillate fractions that yield high-value diesel and jet fuel when refined."}
+    {"⚠️ NOTICE: This nation has ZERO operating refineries. It must export 100% of crude and import 100% of finished fuels at open crack-spread prices." if country_row['Refinery_Count'] == 0 else ""}
     """)
 
 # -----------------------------------------------------------------------------
-# 5. ENHANCED MAP: MULTI-LAYER VIEWS (INC. REFINERIES)
+# 5. ENHANCED MAP: HIGH-VISIBILITY MULTI-LAYER VIEWS
 # -----------------------------------------------------------------------------
 st.markdown("---")
 st.subheader("🗺️ Global Oil Map: Production, Reserves, Runways & Refineries")
 
 map_view = st.radio(
-    "Select Map Metric Layer:",
+    "Select Active Map Layer (Click an option to switch view):",
     [
         "Current Daily Production (mb/d)", 
         "Proven Reserves (Billion Barrels)", 
@@ -391,7 +453,6 @@ with tab_map:
         color_scale = "Tealgrn"
         legend_title = "Refinery Count"
     else:
-        # Cap visual gradient at 120 years so multi-century reserves don't wash out the scale
         df_countries["Years_Left_Display"] = df_countries["Years_Left"].clip(upper=120)
         color_col = "Years_Left_Display"
         color_scale = "Viridis"
@@ -415,7 +476,7 @@ with tab_map:
         color=color_col,
         color_continuous_scale=color_scale,
         labels={color_col: legend_title},
-        template="plotly_dark"
+        template=plotly_template
     )
     fig_map.update_traces(hovertemplate=custom_hover)
     fig_map.update_layout(
@@ -438,12 +499,12 @@ with tab_comparison:
             y=df_sorted_ref["Country"],
             x=df_sorted_ref["Refinery_Count"],
             orientation='h',
-            marker=dict(color='#3fb950')
+            marker=dict(color='#238636')
         ))
         fig_ref.update_layout(
             title="Operating Oil Refineries per Country",
             xaxis_title="Active Facility Count",
-            template="plotly_dark",
+            template=plotly_template,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             height=450,
@@ -462,7 +523,7 @@ with tab_comparison:
         fig_res.update_layout(
             title="Total Proven Reserves (Billion Barrels)",
             xaxis_title="Billion Barrels (Bbbl)",
-            template="plotly_dark",
+            template=plotly_template,
             paper_bgcolor="rgba(0,0,0,0)",
             plot_bgcolor="rgba(0,0,0,0)",
             height=450,
@@ -501,7 +562,7 @@ with tab_chemistry:
                 "API_Gravity": "API Gravity (Degrees) [Light > 31° > Heavy]"
             },
             title="Crude Quality Matrix (Bubble Size = Operating Refinery Count)",
-            template="plotly_dark"
+            template=plotly_template
         )
         fig_scatter.add_vline(x=0.5, line_dash="dash", line_color="#8b949e", annotation_text="Sweet / Sour Split")
         fig_scatter.add_hline(y=31.1, line_dash="dash", line_color="#8b949e", annotation_text="Heavy / Light Split")
@@ -536,7 +597,7 @@ with col_s1:
         hole=.5,
         marker=dict(colors=['#238636', '#da3633', '#e3b341'])
     )])
-    fig_up.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), height=250)
+    fig_up.update_layout(template=plotly_template, paper_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), height=250)
     st.plotly_chart(fig_up, use_container_width=True)
     st.write(f"**Bypass Pipelines:** Handling **{min(sim_hormuz_block, bypass_cap):.1f} mb/d** (East-West Petroline + UAE Fujairah).")
 
@@ -548,7 +609,7 @@ with col_s2:
     vlcc_rate = 185000 if sim_bab_mandeb_block else 35000
     
     st.metric("Red Sea / Suez Status", "BLOCKED / REROUTED" if sim_bab_mandeb_block else "OPEN")
-    st.metric("Middle East ➔ Europe Transit", f"{transit_days} Days", f"+{transit_days-19} Days (Cape of Good Hope)" if sim_bab_mandeb_block else "Standard Route")
+    st.metric("Middle East ➔ Europe Transit", f"{transit_days} Days", f"+{transit_days-19} Days (Cape Detour)" if sim_bab_mandeb_block else "Direct Route")
     st.metric("Supertanker (VLCC) Day Rate", f"${vlcc_rate:,.0f}/day", "+428% Shipping Cost Surge" if sim_bab_mandeb_block else "Baseline Rate")
 
 with col_s3:
@@ -562,9 +623,9 @@ with col_s3:
         x=[sim_refinery_loss, sim_china_export_cut, 30.0 - refining_offline],
         y=['Refinery Strikes', 'China Hoarding', 'Operating Diesel Output'],
         orientation='h',
-        marker=dict(color=['#f85149', '#d29922', '#238636'])
+        marker=dict(color=['#da3633', '#e3b341', '#238636'])
     ))
-    fig_bar.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), height=170)
+    fig_bar.update_layout(template=plotly_template, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)", margin=dict(l=10, r=10, t=10, b=10), height=170)
     st.plotly_chart(fig_bar, use_container_width=True)
 
 # -----------------------------------------------------------------------------
@@ -578,7 +639,7 @@ col_cs1, col_cs2 = st.columns([1, 1])
 with col_cs1:
     st.markdown("""
     #### What is the Crack Spread?
-    The **crack spread** is the price spread between raw crude oil and the wholesale value of the refined products (diesel, jet fuel, gasoline) made from it.
+    The **crack spread** is the price spread between raw crude oil and the wholesale value of the refined fuels (diesel, jet fuel, gasoline) made from it.
     
     Refineries trade on the standard **3:2:1 Crack Spread**:
     For every 3 barrels of crude oil processed, a typical refinery produces roughly **2 barrels of gasoline** and **1 barrel of diesel/distillates**.
@@ -597,10 +658,10 @@ with col_cs2:
     fig_crack.add_trace(go.Bar(name='Crude Base Cost', x=['Live Market', 'Crisis Scenario'], 
                                 y=[live_mkt["Brent"], simulated_crude], marker_color='#388bfd'))
     fig_crack.add_trace(go.Bar(name='Diesel Crack Spread', x=['Live Market', 'Crisis Scenario'], 
-                                y=[live_mkt["Diesel_Crack"], simulated_crack], marker_color='#f85149'))
+                                y=[live_mkt["Diesel_Crack"], simulated_crack], marker_color='#da3633'))
     
     fig_crack.update_layout(barmode='stack', title="Wholesale Finished Diesel Breakdown ($/bbl)", 
-                            template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
+                            template=plotly_template, paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                             height=300, margin=dict(l=20, r=20, t=40, b=20))
     st.plotly_chart(fig_crack, use_container_width=True)
     
@@ -642,9 +703,9 @@ with col_n1:
              simulated_crude - backwardation_premium*0.5, simulated_crude - backwardation_premium*0.7, 
              simulated_crude - backwardation_premium*0.9, simulated_crude - backwardation_premium]
 
-    fig_curve = go.Figure(go.Scatter(x=months, y=curve, mode='lines+markers', line=dict(color='#a371f7', width=3)))
+    fig_curve = go.Figure(go.Scatter(x=months, y=curve, mode='lines+markers', line=dict(color='#8957e5', width=3)))
     fig_curve.update_layout(title="Crude Futures Curve (Backwardation = Physical Shortage)",
-                            yaxis_title="Price ($/bbl)", template="plotly_dark",
+                            yaxis_title="Price ($/bbl)", template=plotly_template,
                             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
                             height=320, margin=dict(l=20, r=20, t=40, b=20))
     st.plotly_chart(fig_curve, use_container_width=True)
