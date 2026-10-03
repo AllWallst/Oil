@@ -73,31 +73,34 @@ def load_country_oil_data():
     ]
     return pd.DataFrame(data)
 
-@st.cache_data(ttl=900)
+@st.cache_data(ttl=900)  # Caches news for 15 minutes to save bandwidth & speed up loads
 def fetch_energy_news():
-    """
-    Fetches real-time RSS feeds from oil and energy sector journalists.
-    """
     feeds = [
         "https://oilprice.com/rss/main",
         "https://www.rigzone.com/news/rss/rigzone_latest.aspx"
     ]
     articles = []
+    
+    # Custom User-Agent prevents web servers from dropping Streamlit Cloud IPs
+    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+
     for feed_url in feeds:
         try:
-            parsed = feedparser.parse(feed_url)
-            for entry in parsed.entries[:5]:
-                articles.append({
-                    "title": entry.title,
-                    "link": entry.link,
-                    "published": getattr(entry, "published", datetime.utcnow().strftime("%Y-%m-%d")),
-                    "source": parsed.feed.get("title", "Energy Intelligence")
-                })
+            req = urllib.request.Request(feed_url, headers=headers)
+            with urllib.request.urlopen(req, timeout=4) as response:
+                parsed = feedparser.parse(response.read())
+                for entry in parsed.entries[:5]:
+                    articles.append({
+                        "title": entry.title,
+                        "link": entry.link,
+                        "published": getattr(entry, "published", datetime.utcnow().strftime("%Y-%m-%d")),
+                        "source": parsed.feed.get("title", "Energy Intelligence")
+                    })
         except Exception:
             continue
-    
+
+    # Built-in fallback so the UI never displays an ugly empty box if feeds fail
     if not articles:
-        # Fallback articles if network is restricted
         articles = [
             {"title": "Red Sea Tanker Diversions Force Cape of Good Hope Transit to 48-Day Turnaround", "link": "https://www.eia.gov", "published": "Live", "source": "Maritime Logistics Index"},
             {"title": "Global Diesel Crack Spread Widens Past $85/bbl Following Refinery Drone Strikes", "link": "https://www.iea.org", "published": "Live", "source": "IEA Petroleum Market Report"},
