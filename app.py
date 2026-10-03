@@ -27,28 +27,67 @@ theme_choice = st.sidebar.radio(
 is_dark = (theme_choice == "🌙 Dark Mode")
 plotly_template = "plotly_dark" if is_dark else "plotly_white"
 
-# High-Contrast Dynamic CSS
+# High-Contrast Dynamic CSS (targeting main canvas + sidebar + header)
 if is_dark:
     css = """
     <style>
-        /* Base Dark Palette */
+        /* Top Navigation Header */
+        header[data-testid="stHeader"] {
+            background-color: #0d1117 !important;
+        }
+
+        /* Base App Canvas */
         .stApp {
             background-color: #0d1117 !important;
             color: #ffffff !important;
         }
         
+        /* ----------------- SIDEBAR DARK MODE FIX ----------------- */
+        section[data-testid="stSidebar"] {
+            background-color: #161b22 !important;
+            border-right: 1px solid #30363d !important;
+        }
+        section[data-testid="stSidebar"] > div {
+            background-color: #161b22 !important;
+        }
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] h4 {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] {
+            color: #e6edf3 !important;
+            font-weight: 500;
+        }
+        /* Checkbox labels inside sidebar */
+        section[data-testid="stSidebar"] label[data-baseweb="checkbox"] span {
+            color: #ffffff !important;
+            font-weight: 700 !important;
+        }
+        /* Slider labels inside sidebar */
+        section[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] label p {
+            color: #58a6ff !important;
+            font-weight: 700 !important;
+        }
+        /* --------------------------------------------------------- */
+
         /* Headers */
         h1, h2, h3, h4, h5, h6 {
             color: #ffffff !important;
             font-weight: 700 !important;
         }
 
-        /* ALL Text & Paragraphs */
-        p, span, div, li {
+        /* ALL Text & Paragraphs in Main Body */
+        .stApp p, .stApp span, .stApp div, .stApp li {
             color: #e6edf3 !important;
         }
         
-        /* High-Visibility Radio Buttons (Fixes "Operating Oil Refineries" readability) */
+        /* High-Visibility Radio Buttons */
         div[data-testid="stRadio"] label {
             background-color: #161b22 !important;
             border: 1px solid #30363d !important;
@@ -126,20 +165,59 @@ if is_dark:
 else:
     css = """
     <style>
-        /* Base Light Palette */
+        /* Top Navigation Header */
+        header[data-testid="stHeader"] {
+            background-color: #f6f8fa !important;
+        }
+
+        /* Base App Canvas */
         .stApp {
             background-color: #f6f8fa !important;
             color: #1f2328 !important;
         }
         
+        /* ----------------- SIDEBAR LIGHT MODE FIX ----------------- */
+        section[data-testid="stSidebar"] {
+            background-color: #ffffff !important;
+            border-right: 1px solid #d0d7de !important;
+        }
+        section[data-testid="stSidebar"] > div {
+            background-color: #ffffff !important;
+        }
+        section[data-testid="stSidebar"] h1,
+        section[data-testid="stSidebar"] h2,
+        section[data-testid="stSidebar"] h3,
+        section[data-testid="stSidebar"] h4 {
+            color: #0d1117 !important;
+            font-weight: 700 !important;
+        }
+        section[data-testid="stSidebar"] p,
+        section[data-testid="stSidebar"] span,
+        section[data-testid="stSidebar"] label,
+        section[data-testid="stSidebar"] div[data-testid="stMarkdownContainer"] {
+            color: #1f2328 !important;
+            font-weight: 500;
+        }
+        /* Checkbox labels inside sidebar */
+        section[data-testid="stSidebar"] label[data-baseweb="checkbox"] span {
+            color: #0d1117 !important;
+            font-weight: 700 !important;
+        }
+        /* Slider labels inside sidebar */
+        section[data-testid="stSidebar"] div[data-testid="stWidgetLabel"] label p {
+            color: #0969da !important;
+            font-weight: 700 !important;
+        }
+        /* ---------------------------------------------------------- */
+
         /* Headers */
         h1, h2, h3, h4, h5, h6 {
             color: #0d1117 !important;
             font-weight: 700 !important;
         }
 
-        /* ALL Text & Paragraphs */
-        p, span, div, li {
+        /* ALL Text & Paragraphs in Main Body */
+        .stApp p, .stApp span, .stApp div, .stApp li {
             color: #1f2328 !important;
         }
         
